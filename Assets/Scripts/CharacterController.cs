@@ -2,10 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestScript : MonoBehaviour
+public class CharacterController : MonoBehaviour
 {
-    private string testVar = "test";
-    public string myString = "My String";
     // Start is called before the first frame update
     void Start()
     {
@@ -15,6 +13,8 @@ public class TestScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // Ground movement
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
     }
 }
