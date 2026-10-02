@@ -13,15 +13,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     [Tooltip("Insert Main Camera")]
     private Camera mainCamera;
+    
+    [SerializeField]
+    [Tooltip("Insert Animation Controller")]
+    private Animator playerAnimator;
 
     private Vector3 velocity;
     private float gravity = -9.8f;
     
     private bool grounded = false;
-    private float groundCastDistance = 0.05f;
+    private float groundCastDistance = 0.08f;
 
-    public float jumpHeight = 10f;
-    public float speed = 5f;
+    public float jumpHeight = 20f;
+    public float speed = 2f;
+    public float runSpeed = 5f;
     
     // Start is called before the first frame update
     void Start()
@@ -54,7 +59,25 @@ public class PlayerController : MonoBehaviour
         float z = Input.GetAxis("Vertical");
         
         Vector3 movement = (playerTransform.right * x + playerTransform.forward * z);
-        controller.Move(movement * speed * Time.deltaTime);
+        if (movement.magnitude > 0)
+        {
+            playerAnimator.SetBool("IsWalking", true);
+        }
+        else
+        {
+            playerAnimator.SetBool("IsWalking", false);
+        }
+        
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            controller.Move(movement * runSpeed * Time.deltaTime);
+            playerAnimator.SetBool("IsRunning", true);
+        }
+        else
+        {
+            controller.Move(movement * speed * Time.deltaTime);
+            playerAnimator.SetBool("IsRunning", false);
+        }
         
         // rotate along camera
         playerTransform.rotation = Quaternion.AngleAxis(cameraTransform.rotation.eulerAngles.y, Vector3.up);
@@ -69,6 +92,7 @@ public class PlayerController : MonoBehaviour
         }
         
         controller.Move(velocity * Time.deltaTime);
+        playerAnimator.SetBool("IsJumping", !grounded);
     }
 
     private void OnApplicationFocus(bool hasFocus)
