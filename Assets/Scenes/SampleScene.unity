@@ -896,6 +896,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac0b09e7857660247b1477e93731de29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!4 &1489991295 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1849681958041138152, guid: e7c6d3979908042338e083da58545fb4, type: 3}
+  m_PrefabInstance: {fileID: 1818518577}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1699560852
 GameObject:
   m_ObjectHideFlags: 3
@@ -1159,6 +1164,14 @@ PrefabInstance:
       propertyPath: mainCamera
       value: 
       objectReference: {fileID: 963194227}
+    - target: {fileID: 172637244261139184, guid: e7c6d3979908042338e083da58545fb4, type: 3}
+      propertyPath: pokeballPF
+      value: 
+      objectReference: {fileID: 3393914669448749477, guid: d146f06743551429791097966b3240c7, type: 3}
+    - target: {fileID: 172637244261139184, guid: e7c6d3979908042338e083da58545fb4, type: 3}
+      propertyPath: pokeballBone
+      value: 
+      objectReference: {fileID: 1489991295}
     - target: {fileID: 172637244261139184, guid: e7c6d3979908042338e083da58545fb4, type: 3}
       propertyPath: playerAnimator
       value: 
