@@ -377,9 +377,12 @@ MonoBehaviour:
   controller: {fileID: 172637244261139151}
   mainCamera: {fileID: 0}
   playerAnimator: {fileID: 0}
+  pokeballPF: {fileID: 0}
+  pokeballBone: {fileID: 0}
   jumpHeight: 20
   speed: 2
   runSpeed: 5
+  throwStrength: 4
 --- !u!143 &172637244261139151
 CharacterController:
   m_ObjectHideFlags: 0
@@ -394,7 +397,7 @@ CharacterController:
   m_Height: 2.3
   m_Radius: 0.5
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.1
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 1.15, z: 0}
