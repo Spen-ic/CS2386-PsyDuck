@@ -30,6 +30,8 @@ public class PsyduckController : MonoBehaviour
     
     private GameObject trainer;
     private Animator pokemonAnimator;
+
+    private LevelManager levelManager;
     
     // Start is called before the first frame update
     void Start()
@@ -37,6 +39,7 @@ public class PsyduckController : MonoBehaviour
         trainer = GameObject.Find("Trainer");
         walkingSpeed = GetComponent<NavMeshAgent>().speed;
         pokemonAnimator = GetComponent<Animator>();
+        levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
         switchToState(State.Chill);
     }
 
@@ -161,7 +164,7 @@ public class PsyduckController : MonoBehaviour
 
     public void digCompleted()
     {
-        Destroy(gameObject);
+        levelManager.removePokemon(gameObject, false); // escaping/removing, NOT captured
     }
 
     void updatePokemonAnimator(bool saunter, bool flee, bool dig)

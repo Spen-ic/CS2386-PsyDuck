@@ -17,6 +17,7 @@ public class PokeballController : MonoBehaviour
     private bool didOnce;
     private bool escaped;
     private bool checkForEscape = true; // make sure coroutine is not rerun every frame
+    private LevelManager levelManager;
 
     private Rigidbody rigidbody;
     
@@ -27,6 +28,7 @@ public class PokeballController : MonoBehaviour
 
         pokeballAnimator.speed = 0;
         trainer = GameObject.Find("Trainer").transform.Find("CameraFocus");
+        levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
     }
 
     // Update is called once per frame
@@ -96,7 +98,7 @@ public class PokeballController : MonoBehaviour
 
                     if (checkForEscape)
                     {
-                        float r = Random.Range(1, 10);
+                        int r = Random.Range(1, 10);
                         if (r == 1)
                         {
                             escaped = true;
@@ -133,7 +135,7 @@ public class PokeballController : MonoBehaviour
                     }
                     else
                     {
-                        Destroy(pokemon);
+                        levelManager.removePokemon(pokemon, true);
                     }
                     break;
             }

@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI%20Toolkit/Images/titlescreen.jpg?fileID=2800000&amp;guid=dee4002d596a54c4ca5ea76bf313aa4f&amp;type=3#titlescreen&quot;); align-items: center; justify-content: flex-end;">
+        <ui:Label text=" Press Any Key to Play" display-tooltip-when-elided="true" name="CallToAction" style="bottom: 3%; -unity-font: url(&quot;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days.otf?fileID=12800000&amp;guid=80ca46803ba604257a835d67e0ac985a&amp;type=3#Lemon Days&quot;); -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/Fonts/Lemon%20Days%20SDF.asset?fileID=11400000&amp;guid=f55d18eff44df4888aae028322ae7b0a&amp;type=2#Lemon Days SDF&quot;); font-size: 40px; color: rgb(255, 205, 0); text-shadow: 3px 3px 0 rgba(0, 4, 140, 255);" />
+    </ui:VisualElement>
+</ui:UXML>
