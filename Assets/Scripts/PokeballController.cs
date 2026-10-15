@@ -17,10 +17,14 @@ public class PokeballController : MonoBehaviour
     private bool didOnce;
     private bool escaped;
     private bool checkForEscape = true; // make sure coroutine is not rerun every frame
+
+    private Rigidbody rigidbody;
     
     // Start is called before the first frame update
     void Start()
     {
+        rigidbody = GetComponent<Rigidbody>();
+
         pokeballAnimator.speed = 0;
         trainer = GameObject.Find("Trainer").transform.Find("CameraFocus");
     }
@@ -28,7 +32,6 @@ public class PokeballController : MonoBehaviour
     // Update is called once per frame
     private void FixedUpdate()
     {
-        Rigidbody rigidbody = GetComponent<Rigidbody>();
         if (pokemon != null)
         {
             switch (animationStage)
@@ -125,6 +128,7 @@ public class PokeballController : MonoBehaviour
                         }
                         Destroy(gameObject);
                         pokemon.SetActive(true);
+                        pokemon.transform.position += new Vector3(0, 2, 0);
                         break;
                     }
                     else
