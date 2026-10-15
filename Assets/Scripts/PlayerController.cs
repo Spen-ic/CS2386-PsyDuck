@@ -126,7 +126,6 @@ public class PlayerController : MonoBehaviour
         if (instantiatedPokeball == null)
         {
             instantiatedPokeball = Instantiate(pokeballPF, pokeballBone, false);
-            Debug.Log(instantiatedPokeball.transform.localScale);
         }
     }
 
@@ -134,7 +133,6 @@ public class PlayerController : MonoBehaviour
     {
         if (instantiatedPokeball != null)
         {
-            Debug.Log(instantiatedPokeball.transform.localScale);
             instantiatedPokeball.transform.parent = null; // release ball from bone
             instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
             instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
@@ -142,7 +140,6 @@ public class PlayerController : MonoBehaviour
             Vector3 throwAdjustment = new Vector3(0f, 2f, 0f);
             Vector3 throwVector = cameraTransform.forward * throwStrength + throwAdjustment;
             instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
-            Debug.Log(instantiatedPokeball.transform.localScale);
             instantiatedPokeball = null;
         }
     }

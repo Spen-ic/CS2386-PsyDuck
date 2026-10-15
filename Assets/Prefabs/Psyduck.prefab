@@ -277,7 +277,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentState: 0
   currentDestination: {x: 0, y: 0, z: 0}
-  runSpeed: 0
+  runSpeed: 10
 --- !u!136 &2143722460053380749
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -302,7 +302,7 @@ Animator:
   m_GameObject: {fileID: 2192235743791161030}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: ac9a7c1c3130342819cd75dbca14177b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
