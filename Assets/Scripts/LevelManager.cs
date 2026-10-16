@@ -10,6 +10,8 @@ public class LevelManager : MonoBehaviour
 
     public float currentTime;
     public float endTime;
+
+    private GUIManager GUI;
     
     // Start is called before the first frame update
     void Start()
@@ -18,6 +20,7 @@ public class LevelManager : MonoBehaviour
         amountOfPokemon = GameObject.FindGameObjectsWithTag("Pokemon").Length;
         startingAmountOfPokemon = amountOfPokemon;
         endTime = 15f;
+        GUI = GameObject.Find("GUI").GetComponent<GUIManager>();
     }
 
     // Update is called once per frame
@@ -37,11 +40,11 @@ public class LevelManager : MonoBehaviour
         if (capture)
         {
             amountOfPokemonCaught++;
-            Debug.Log("Captured Psyduck!");
+            GUI.ReportToPlayer("Success!", amountOfPokemon + " remaining", 2.0f);
         }
         else
         {
-            Debug.Log("Psyduck escaped!!! :O");
+            GUI.ReportToPlayer("A Psyduck escaped!", amountOfPokemon + " remaining", 2.0f);
         }
         if (amountOfPokemon <= 0)
         {
@@ -56,11 +59,13 @@ public class LevelManager : MonoBehaviour
         if (amountOfPokemonCaught == 1)
         {
             Debug.Log("yay... you captured " + amountOfPokemonCaught + " psyduck " + reason);
-
+            GUI.ReportToPlayer("Well done!", "You have captured " + amountOfPokemonCaught + " Psyduck ", reason);
         }
         else
         {
             Debug.Log("yay... you captured " + amountOfPokemonCaught + " psyducks " + reason);
+            GUI.ReportToPlayer("Well done!", "You have captured " + amountOfPokemonCaught + " Psyducks ", reason);
+
         }
     }
 }
