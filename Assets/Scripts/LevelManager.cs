@@ -19,7 +19,7 @@ public class LevelManager : MonoBehaviour
         Time.timeScale = 1;
         amountOfPokemon = GameObject.FindGameObjectsWithTag("Pokemon").Length;
         startingAmountOfPokemon = amountOfPokemon;
-        endTime = 15f;
+        endTime = 300f;
         GUI = GameObject.Find("GUI").GetComponent<GUIManager>();
     }
 

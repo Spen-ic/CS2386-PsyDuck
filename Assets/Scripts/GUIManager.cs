@@ -60,8 +60,10 @@ public class GUIManager : MonoBehaviour
 
         titleLabel.text = title;
         line1Label.text = line1;
+        line2Label.text = "";
         titleLabel.visible = true;
         line1Label.visible = true;
+        line2Label.visible = false;
         returnButton.visible = true;
         returnButton.text = "Return to Start";
         

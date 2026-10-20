@@ -32,6 +32,15 @@ public class PsyduckController : MonoBehaviour
     private Animator pokemonAnimator;
 
     private LevelManager levelManager;
+
+    [SerializeField] private AudioClip[] psySounds;
+    [SerializeField] private AudioClip[] grassSounds;
+    [SerializeField] private AudioClip[] sandSounds;
+    private AudioSource pokemonAS1;
+    private AudioSource pokemonAS2;
+
+    private bool shutUp;
+
     
     // Start is called before the first frame update
     void Start()
@@ -41,6 +50,21 @@ public class PsyduckController : MonoBehaviour
         pokemonAnimator = GetComponent<Animator>();
         levelManager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
         switchToState(State.Chill);
+
+        pokemonAS1 = GetComponents<AudioSource>()[0];
+        pokemonAS1.volume = 1f;
+        pokemonAS1.spatialBlend = 1f;
+        pokemonAS1.maxDistance = 5f;
+        
+        pokemonAS2 = GetComponents<AudioSource>()[1];
+        pokemonAS2.volume = 0.25f;
+        pokemonAS2.spatialBlend = 1f;
+        pokemonAS2.maxDistance = 5f;
+
+        shutUp = true;
+        Invoke("resetShutUp", Random.Range(5f, 20f));
+
+        footStepLayerName(transform.position, Terrain.activeTerrain);
     }
 
     // Update is called once per frame
@@ -49,6 +73,7 @@ public class PsyduckController : MonoBehaviour
         switch (currentState)
         {
             case State.Chill:
+                playSound(State.Chill);
                 if (transitionActive)
                 {
                     currentDestination = transform.position;
@@ -67,6 +92,8 @@ public class PsyduckController : MonoBehaviour
                 
                 break;
             case State.Saunter:
+                playSound(State.Saunter);
+
                 if (transitionActive)
                 {
                     currentDestination = validDestination(false);
@@ -88,6 +115,8 @@ public class PsyduckController : MonoBehaviour
 
                 break;
             case State.Flee:
+                playSound(State.Flee);
+
                 if (transitionActive)
                 {
                     CancelInvoke("switchToSaunter");
@@ -174,6 +203,40 @@ public class PsyduckController : MonoBehaviour
         pokemonAnimator.SetBool("Dig", dig);
 
     }
+    
+    void playSound(State currentState)
+    {
+        if (currentState == State.Chill || currentState == State.Saunter)
+        {
+            pokemonAS1.loop = false; // can be true from flee loop  
+
+            if (!shutUp)
+            {
+                if (Random.Range(1, 10) == 1)
+                {
+                    pokemonAS1.clip = psySounds[Random.Range(0, 2)]; // index 2 is for fleeing only
+                    pokemonAS1.Play();
+                    shutUp = true;
+                    Invoke("resetShutUp", Random.Range(5f, 20f));
+                }
+            }
+        }
+
+        if (currentState == State.Flee)
+        {
+            if (transitionActive)
+            {
+                pokemonAS1.clip = psySounds[2]; // flee sound
+                pokemonAS1.loop = true;
+                pokemonAS1.Play();
+            }
+        }
+    }
+    
+    void resetShutUp()
+    {
+        shutUp = false;
+    }
 
     Vector3 validDestination(bool avoidTrainer)
     {
@@ -218,5 +281,58 @@ public class PsyduckController : MonoBehaviour
         }
 
         return false;
+    }
+
+    public float[] GetTextureMix(Vector3 pokemonPosition, Terrain terrain)
+    {
+        Vector3 terrainPosition = terrain.transform.position;
+        TerrainData terrainData = terrain.terrainData;
+
+        // position of player relative to terrain alpha map
+        int mapPositionX = Mathf.RoundToInt((pokemonPosition.x - terrainPosition.x) / terrainData.size.x * 
+                                            terrainData.alphamapWidth);
+        int mapPositionZ = Mathf.RoundToInt((pokemonPosition.z - terrainPosition.z) / terrainData.size.z * 
+                                            terrainData.alphamapHeight);
+
+        float[,,] splatMapData = terrainData.GetAlphamaps(mapPositionX, mapPositionZ, 1, 1);
+
+        // extract all values into cellMix by converting 3D -> 1D array
+        float[] cellMix = new float[splatMapData.GetUpperBound(2) + 1];
+        for (int i = 0; i < cellMix.Length; i++)
+        {
+            cellMix[i] = splatMapData[0, 0, i];
+        }
+
+        return cellMix;
+    }
+
+    public string footStepLayerName(Vector3 pokemonPosition, Terrain terrain)
+    {
+        float[] cellMix = GetTextureMix(pokemonPosition, terrain);
+        float strongestTexture = 0;
+        int maxIndex = 0;
+
+        for (int i = 0; i < cellMix.Length; i++)
+        {
+            if (cellMix[i] > strongestTexture)
+            {
+                strongestTexture = cellMix[i];
+                maxIndex = i;
+            }
+        }
+
+        return terrain.terrainData.terrainLayers[maxIndex].name;
+    }
+
+    public void footStep()
+    {
+        pokemonAS2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
+        if (footStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
+        {
+            pokemonAS2.clip = sandSounds[Random.Range(0, sandSounds.Length)];
+
+        }
+        
+        pokemonAS2.Play();
     }
 }
