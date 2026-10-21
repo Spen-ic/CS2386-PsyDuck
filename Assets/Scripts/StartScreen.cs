@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -7,16 +5,16 @@ using UnityEngine.UIElements;
 public class StartScreen : MonoBehaviour
 {
 
-    private VisualElement root;
-    private Label callToAction;
+    private VisualElement _root;
+    private Label _callToAction;
 
     // Start is called before the first frame update
     void Start()
     {
-        root = GetComponent<UIDocument>().rootVisualElement;
-        callToAction = root.Q<Label>("CallToAction");
+        _root = GetComponent<UIDocument>().rootVisualElement;
+        _callToAction = _root.Q<Label>("CallToAction");
         Time.timeScale = 1;
-        InvokeRepeating("blinkCallToAction", 0.25f, 0.25f);
+        InvokeRepeating(nameof(BlinkCallToAction), 0.25f, 0.25f);
     }
 
     // Update is called once per frame
@@ -28,8 +26,8 @@ public class StartScreen : MonoBehaviour
         }
     }
 
-    void blinkCallToAction()
+    void BlinkCallToAction()
     {
-        callToAction.visible = !callToAction.visible;
+        _callToAction.visible = !_callToAction.visible;
     }
 }

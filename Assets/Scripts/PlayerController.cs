@@ -1,12 +1,13 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class PlayerController : MonoBehaviour
 {
+    private static readonly int IsThrowing = Animator.StringToHash("IsThrowing");
+    private static readonly int IsRunning = Animator.StringToHash("IsRunning");
+    private static readonly int IsWalking = Animator.StringToHash("IsWalking");
+    private static readonly int IsJumping = Animator.StringToHash("IsJumping");
+
     [SerializeField]
     [Tooltip("Insert Character Controller")]
     private CharacterController controller;
@@ -21,32 +22,33 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField]
     [Tooltip("Insert Pokeball prefab")]
+    // ReSharper disable once InconsistentNaming
     private GameObject pokeballPF;
     
     [SerializeField]
     [Tooltip("Insert Pokeball bone transform")]
     private Transform pokeballBone;
 
-    private Vector3 velocity;
-    private float gravity = -9.8f;
+    private Vector3 _velocity;
+    private float _gravity = -9.8f;
     
-    private bool grounded = false;
-    private float groundCastDistance = 0.08f;
+    private bool _grounded;
+    private float _groundCastDistance = 0.08f;
 
     public float jumpHeight = 20f;
     public float speed = 2f;
     public float runSpeed = 5f;
 
-    private bool throwing = false;
+    private bool _throwing;
     public float throwStrength = 4f;
-    private GameObject instantiatedPokeball;
+    private GameObject _instantiatedPokeball;
     
     [SerializeField] private AudioClip[] grassSounds;
     [SerializeField] private AudioClip[] sandSounds;
+    // ReSharper disable once InconsistentNaming
     private AudioSource playerAS1;
+    // ReSharper disable once InconsistentNaming
     private AudioSource playerAS2;
-
-    private bool shutUp;
     
     // Start is called before the first frame update
     void Start()
@@ -60,10 +62,7 @@ public class PlayerController : MonoBehaviour
         playerAS2.volume = 0.25f;
         playerAS2.spatialBlend = 1f;
         playerAS2.maxDistance = 5f;
-
-        shutUp = true;
-        Invoke("resetShutUp", Random.Range(5f, 20f));
-
+        
         footStepLayerName(transform.position, Terrain.activeTerrain);
     }
 
@@ -75,16 +74,16 @@ public class PlayerController : MonoBehaviour
         Transform cameraTransform = mainCamera.transform;
 
         // Grounded
-        grounded = Physics.Raycast(playerTransform.position, Vector3.down, groundCastDistance);
+        _grounded = Physics.Raycast(playerTransform.position, Vector3.down, _groundCastDistance);
 
         // DEBUG - Visualize rays
-        if (grounded)
+        if (_grounded)
         {
-            Debug.DrawRay(playerTransform.position, Vector3.down * groundCastDistance, Color.blue);
+            Debug.DrawRay(playerTransform.position, Vector3.down * _groundCastDistance, Color.blue);
         }
         else
         {
-            Debug.DrawRay(playerTransform.position, Vector3.down * groundCastDistance, Color.red);
+            Debug.DrawRay(playerTransform.position, Vector3.down * _groundCastDistance, Color.red);
         }
         
         // Ground movement
@@ -94,38 +93,38 @@ public class PlayerController : MonoBehaviour
         Vector3 movement = (playerTransform.right * x + playerTransform.forward * z);
         
         // Throw
-        if (Input.GetButtonDown("Fire1") && grounded)
+        if (Input.GetButtonDown("Fire1") && _grounded)
         {
-            throwing = true;
+            _throwing = true;
             SpawnPokeballToBone();
-            playerAnimator.SetBool("IsThrowing", true);
+            playerAnimator.SetBool(IsThrowing, true);
         }
         
         // apply movement
-        if (!throwing)
+        if (!_throwing)
         {
             // Reg movement/running
             if (Input.GetKey(KeyCode.LeftShift))
             {
-                controller.Move(movement * runSpeed * Time.deltaTime);
-                playerAnimator.SetBool("IsRunning", true);
+                controller.Move(movement * (runSpeed * Time.deltaTime));
+                playerAnimator.SetBool(IsRunning, true);
                 playerAS2.volume = 0.4f;
             }
             else
             {
-                controller.Move(movement * speed * Time.deltaTime);
-                playerAnimator.SetBool("IsRunning", false);
+                controller.Move(movement * (speed * Time.deltaTime));
+                playerAnimator.SetBool(IsRunning, false);
                 playerAS2.volume = 0.25f;
             }
         }
         
         if (movement.magnitude > 0)
         {
-            playerAnimator.SetBool("IsWalking", true);
+            playerAnimator.SetBool(IsWalking, true);
         }
         else
         {
-            playerAnimator.SetBool("IsWalking", false);
+            playerAnimator.SetBool(IsWalking, false);
         }
         
         // rotate along camera
@@ -133,37 +132,37 @@ public class PlayerController : MonoBehaviour
         // playerTransform.rotation = Quaternion.AngleAxis(playerTransform.rotation.eulerAngles.y + (x * 3), Vector3.up);
 
         // gravity and jumping
-        velocity.y += gravity * Time.deltaTime;
+        _velocity.y += _gravity * Time.deltaTime;
 
-        if (Input.GetButtonDown("Jump") && grounded)
+        if (Input.GetButtonDown("Jump") && _grounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight);
+            _velocity.y = Mathf.Sqrt(jumpHeight);
         }
         
-        controller.Move(velocity * Time.deltaTime);
-        playerAnimator.SetBool("IsJumping", !grounded);
+        controller.Move(_velocity * Time.deltaTime);
+        playerAnimator.SetBool(IsJumping, !_grounded);
     }
 
     private void SpawnPokeballToBone()
     {
-        if (instantiatedPokeball == null)
+        if (_instantiatedPokeball == null)
         {
-            instantiatedPokeball = Instantiate(pokeballPF, pokeballBone, false);
+            _instantiatedPokeball = Instantiate(pokeballPF, pokeballBone, false);
         }
     }
 
     public void ReleasePokeball()
     {
-        if (instantiatedPokeball != null)
+        if (_instantiatedPokeball != null)
         {
-            instantiatedPokeball.transform.parent = null; // release ball from bone
-            instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
-            instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
+            _instantiatedPokeball.transform.parent = null; // release ball from bone
+            _instantiatedPokeball.GetComponent<SphereCollider>().enabled = true;
+            _instantiatedPokeball.GetComponent<Rigidbody>().useGravity = true;
             Transform cameraTransform = mainCamera.transform;
             Vector3 throwAdjustment = new Vector3(0f, 2f, 0f);
             Vector3 throwVector = cameraTransform.forward * throwStrength + throwAdjustment;
-            instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
-            instantiatedPokeball = null;
+            _instantiatedPokeball.GetComponent<Rigidbody>().AddForce(throwVector, ForceMode.Impulse);
+            _instantiatedPokeball = null;
         }
     }
     
@@ -190,6 +189,7 @@ public class PlayerController : MonoBehaviour
         return cellMix;
     }
 
+    // ReSharper disable once InconsistentNaming
     public string footStepLayerName(Vector3 pokemonPosition, Terrain terrain)
     {
         float[] cellMix = GetTextureMix(pokemonPosition, terrain);
@@ -208,6 +208,8 @@ public class PlayerController : MonoBehaviour
         return terrain.terrainData.terrainLayers[maxIndex].name;
     }
     
+    // animation event, DO NOT rename
+    // ReSharper disable once InconsistentNaming
     public void footStep()
     {
         playerAS2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
@@ -222,8 +224,8 @@ public class PlayerController : MonoBehaviour
     
     public void ThrowEnded()
     {
-        throwing = false;
-        playerAnimator.SetBool("IsThrowing", false);
+        _throwing = false;
+        playerAnimator.SetBool(IsThrowing, false);
     }
 
     private void OnApplicationFocus(bool hasFocus)

@@ -1,120 +1,110 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class GUIManager : MonoBehaviour
 {
-    private GroupBox timerGB;
-    private Label time;
+    private GroupBox _timerGb;
+    private Label _time;
 
-    private GroupBox reportGB;
-    private Label titleLabel;
-    private Label line1Label;
-    private Label line2Label;
-    private Button returnButton;
-
-    private LevelManager levelmanager;
+    private GroupBox _reportGb;
+    private Label _titleLabel;
+    private Label _line1Label;
+    private Label _line2Label;
+    private Button _returnButton;
+    
+    // ReSharper disable once IdentifierTypo
+    private LevelManager _levelmanager;
     
     // Start is called before the first frame update
     void Start()
     {
-        levelmanager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        _levelmanager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
 
         VisualElement root = GetComponent<UIDocument>().rootVisualElement;
         
-        timerGB = root.Q<GroupBox>("timer");
-        time = root.Q<Label>("time");
+        _timerGb = root.Q<GroupBox>("timer");
+        _time = root.Q<Label>("time");
         
-        reportGB = root.Q<GroupBox>("report");
-        titleLabel = root.Q<Label>("title");
-        line1Label = root.Q<Label>("line1");
-        line2Label = root.Q<Label>("line2");
-        returnButton = root.Q<Button>("return");
+        _reportGb = root.Q<GroupBox>("report");
+        _titleLabel = root.Q<Label>("title");
+        _line1Label = root.Q<Label>("line1");
+        _line2Label = root.Q<Label>("line2");
+        _returnButton = root.Q<Button>("return");
         
-        returnButton.clicked += returnButtonPressed;
+        _returnButton.clicked += ReturnButtonPressed;
 
-        setDisplay(reportGB, false);
-        setDisplay(timerGB, true);
+        SetDisplay(_reportGb, false);
+        SetDisplay(_timerGb, true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (getDisplay(timerGB))
+        if (GetDisplay(_timerGb))
         {
-            time.text = (levelmanager.endTime - levelmanager.currentTime).ToString("0");
+            _time.text = (_levelmanager.endTime - _levelmanager.currentTime).ToString("0");
         }
     }
 
     public void ReportToPlayer(string title, string line1, float visibleTime)
     {
         Debug.Log("ReportToPlayer called");
-        if (getDisplay(reportGB))
+        if (GetDisplay(_reportGb))
         {
-            CancelInvoke("HideReport");
+            CancelInvoke(nameof(HideReport));
         }
-        setDisplay(timerGB, false);
-        setDisplay(reportGB, true);
+        SetDisplay(_timerGb, false);
+        SetDisplay(_reportGb, true);
 
-        titleLabel.text = title;
-        line1Label.text = line1;
-        line2Label.text = "";
-        titleLabel.visible = true;
-        line1Label.visible = true;
-        line2Label.visible = false;
-        returnButton.visible = true;
-        returnButton.text = "Return to Start";
+        _titleLabel.text = title;
+        _line1Label.text = line1;
+        _line2Label.text = "";
+        _titleLabel.visible = true;
+        _line1Label.visible = true;
+        _line2Label.visible = false;
+        _returnButton.visible = true;
+        _returnButton.text = "Return to Start";
         
-        Invoke("HideReport", visibleTime);
+        Invoke(nameof(HideReport), visibleTime);
     }
     
     public void ReportToPlayer(string title, string line1, string line2)
     {
-        if (getDisplay(reportGB))
+        if (GetDisplay(_reportGb))
         {
-            CancelInvoke("HideReport");
+            CancelInvoke(nameof(HideReport));
         }
-        setDisplay(timerGB, false);
-        setDisplay(reportGB, true);
+        SetDisplay(_timerGb, false);
+        SetDisplay(_reportGb, true);
 
-        titleLabel.text = title;
-        line1Label.text = line1;
-        line2Label.text = line2;
-        titleLabel.visible = true;
-        line1Label.visible = true;
-        line2Label.visible = true;
-        returnButton.visible = true;
-        returnButton.text = "Return to Start";
+        _titleLabel.text = title;
+        _line1Label.text = line1;
+        _line2Label.text = line2;
+        _titleLabel.visible = true;
+        _line1Label.visible = true;
+        _line2Label.visible = true;
+        _returnButton.visible = true;
+        _returnButton.text = "Return to Start";
     }
 
     private void HideReport()
     {
-        setDisplay(timerGB, true);
-        setDisplay(reportGB, false);
+        SetDisplay(_timerGb, true);
+        SetDisplay(_reportGb, false);
     }
 
-    private void returnButtonPressed()
+    private void ReturnButtonPressed()
     {
         SceneManager.LoadScene("Scenes/Start");
     }
 
-    private void setDisplay(GroupBox gb, bool displaying)
+    private void SetDisplay(GroupBox gb, bool displaying)
     {
-        if (displaying)
-        {
-            gb.style.display = DisplayStyle.Flex;
-
-        }
-        else
-        {
-            gb.style.display = DisplayStyle.None;
-
-        }
+        gb.style.display = displaying ? DisplayStyle.Flex : DisplayStyle.None;
     }
 
-    private bool getDisplay(GroupBox gb)
+    private bool GetDisplay(GroupBox gb)
     {
         if (gb.style.display == DisplayStyle.Flex)
         {

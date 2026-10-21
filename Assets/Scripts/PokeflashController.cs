@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PokeflashController : MonoBehaviour
@@ -10,9 +8,5 @@ public class PokeflashController : MonoBehaviour
         Destroy(gameObject, 2.0f);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    // Update is called once per frame (removed; not used)
 }
