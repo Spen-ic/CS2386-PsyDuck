@@ -7,10 +7,11 @@ public class PsyduckController : MonoBehaviour
     private static readonly int Saunter = Animator.StringToHash("Saunter");
     private static readonly int Flee = Animator.StringToHash("Flee");
     private static readonly int Dig = Animator.StringToHash("Dig");
+    private static readonly int Surprised = Animator.StringToHash("Surprised");
 
     private enum State
     {
-        Chill, Saunter, Flee, Dig
+        Chill, Saunter, Flee, Dig, Surprised
     }
 
     [SerializeField]
@@ -31,9 +32,10 @@ public class PsyduckController : MonoBehaviour
     
     private GameObject _trainer;
     private Animator _pokemonAnimator;
+    [SerializeField] private AnimationClip _surprisedAnimation; // used to calculate surprise time
 
     private LevelManager _levelManager;
-
+    
     [SerializeField] private AudioClip[] psySounds;
     [SerializeField] private AudioClip[] grassSounds;
     [SerializeField] private AudioClip[] sandSounds;
@@ -82,14 +84,14 @@ public class PsyduckController : MonoBehaviour
                     GetComponent<NavMeshAgent>().destination = currentDestination;
                     Invoke("SwitchToSaunter", Random.Range(5.0f, 6.0f));
                     GetComponent<NavMeshAgent>().speed = 0f;
-                    UpdatePokemonAnimator(false, false, false);
+                    UpdatePokemonAnimator(false, false, false, false);
                     _transitionActive = false;
                     
                 }
                 
                 if (InView(_trainer, _viewAngle, _viewDistance))
                 {
-                    SwitchToState(State.Flee);
+                    SwitchToState(State.Surprised);
                 }
                 
                 break;
@@ -101,7 +103,7 @@ public class PsyduckController : MonoBehaviour
                     currentDestination = ValidDestination(false);
                     GetComponent<NavMeshAgent>().destination = currentDestination;
                     GetComponent<NavMeshAgent>().speed = _walkingSpeed;
-                    UpdatePokemonAnimator(true, false, false);
+                    UpdatePokemonAnimator(true, false, false, false);
                     _transitionActive = false;
                 }
 
@@ -112,7 +114,7 @@ public class PsyduckController : MonoBehaviour
 
                 if (InView(_trainer, _viewAngle, _viewDistance))
                 {
-                    SwitchToState(State.Flee);
+                    SwitchToState(State.Surprised);
                 }
 
                 break;
@@ -121,11 +123,12 @@ public class PsyduckController : MonoBehaviour
 
                 if (_transitionActive)
                 {
+                    pokemonAS1.pitch = 1f; // have to change back from Surprised state
                     CancelInvoke("SwitchToSaunter");
                     Invoke("CheckForDig", 10f);
                     currentDestination = ValidDestination(true);
                     GetComponent<NavMeshAgent>().destination = currentDestination;
-                    UpdatePokemonAnimator(false, true, false);
+                    UpdatePokemonAnimator(false, true, false, false);
                     GetComponent<NavMeshAgent>().speed = runSpeed;
                     _transitionActive = false;
                 }
@@ -137,12 +140,34 @@ public class PsyduckController : MonoBehaviour
                 }
                 break;
             
+            case State.Surprised:
+                if (_transitionActive)
+                {
+                    pokemonAS1.pitch = 1.1f;
+                    PlaySound(State.Surprised);
+                    CancelInvoke(nameof(SwitchToSaunter));
+                    CancelInvoke(nameof(CheckForDig));
+
+                    GetComponent<NavMeshAgent>().speed = 0.0f;
+                    UpdatePokemonAnimator(false, false, false, true);
+                    // get the length of the surprised anim, wait to invoke flee after
+                    _pokemonAnimator.speed = 2.6f;
+                    float animTime = _surprisedAnimation.length / _pokemonAnimator.speed;
+                    Invoke(nameof(SwitchToFlee), animTime);
+                    _transitionActive = false;
+                }
+                // turn gradually to face trainer in yaw while Surprised (get rid of y component of look vector)
+                Quaternion goalRotation = Quaternion.LookRotation((_trainer.transform.position - transform.position) 
+                                                                  - new Vector3(0, (_trainer.transform.position - transform.position).y, 0));
+                transform.rotation = Quaternion.Lerp(transform.rotation, goalRotation, Time.deltaTime * 3);
+                break;
+            
             case State.Dig:
                 if (_transitionActive)
                 {
                     currentDestination = transform.position;
                     GetComponent<NavMeshAgent>().speed = 0;
-                    UpdatePokemonAnimator(false, false, true);
+                    UpdatePokemonAnimator(false, false, true, false);
                     _transitionActive = false;
                 }
                 break;
@@ -174,6 +199,11 @@ public class PsyduckController : MonoBehaviour
         SwitchToState(State.Saunter);
     }
 
+    void SwitchToFlee()
+    {
+        SwitchToState(State.Flee);
+    }
+
     private void OnDisable()
     {
         CancelInvoke(nameof(SwitchToSaunter));
@@ -199,12 +229,12 @@ public class PsyduckController : MonoBehaviour
         _levelManager.RemovePokemon(gameObject, false); // escaping/removing, NOT captured
     }
 
-    void UpdatePokemonAnimator(bool saunter, bool flee, bool dig)
+    void UpdatePokemonAnimator(bool saunter, bool flee, bool dig, bool surprised)
     {
         _pokemonAnimator.SetBool(Saunter, saunter);
         _pokemonAnimator.SetBool(Flee, flee);
         _pokemonAnimator.SetBool(Dig, dig);
-
+        _pokemonAnimator.SetBool(Surprised, surprised);
     }
     
     void PlaySound(State soundState)
@@ -233,6 +263,12 @@ public class PsyduckController : MonoBehaviour
                 pokemonAS1.loop = true;
                 pokemonAS1.Play();
             }
+        }
+
+        if (soundState == State.Surprised)
+        {
+            pokemonAS1.clip = psySounds[2]; // flee/surprised sound
+            pokemonAS1.Play();
         }
     }
     

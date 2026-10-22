@@ -280,6 +280,7 @@ MonoBehaviour:
   currentState: 0
   currentDestination: {x: 0, y: 0, z: 0}
   runSpeed: 10
+  _surprisedAnimation: {fileID: 7400000, guid: 986104e2ee3ea4161a03bfbcfceb3218, type: 2}
   psySounds:
   - {fileID: 8300000, guid: 7aa9ca80ad3bb4c948f061cd29341941, type: 3}
   - {fileID: 8300000, guid: af5ccda94a8e94f2f8a0591149853fc3, type: 3}
