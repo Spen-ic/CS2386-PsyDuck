@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
@@ -12,6 +13,8 @@ public class GUIManager : MonoBehaviour
     private Label _line1Label;
     private Label _line2Label;
     private Button _returnButton;
+
+    [SerializeField] private AudioClip buttonHoverSound;
     
     // ReSharper disable once IdentifierTypo
     private LevelManager _levelmanager;
@@ -33,6 +36,7 @@ public class GUIManager : MonoBehaviour
         _returnButton = root.Q<Button>("return");
         
         _returnButton.clicked += ReturnButtonPressed;
+        SetupButtonEffects(_returnButton);
 
         SetDisplay(_reportGb, false);
         SetDisplay(_timerGb, true);
@@ -112,5 +116,31 @@ public class GUIManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void SetupButtonEffects(Button button)
+    {
+        StyleColor initialBgColor = button.resolvedStyle.backgroundColor; // ended up havign to use resolvedStyle?
+        AudioSource audioSource = GetComponent<AudioSource>();
+        
+        void OnMouseOverButton(PointerOverEvent evt)
+        {
+            if (evt.currentTarget is Button button)
+            {
+                button.style.backgroundColor = Color.Lerp(initialBgColor.value, Color.white, 0.8f);
+                audioSource.PlayOneShot(buttonHoverSound);
+            }
+        }
+
+        void OnMouseOutButton(PointerOutEvent evt)
+        {
+            if (evt.currentTarget is Button button)
+            {
+                button.style.backgroundColor = initialBgColor;
+            }
+        }
+        
+        button.RegisterCallback<PointerOverEvent>(OnMouseOverButton);
+        button.RegisterCallback<PointerOutEvent>(OnMouseOutButton);
     }
 }
