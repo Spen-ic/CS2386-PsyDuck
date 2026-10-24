@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -15,7 +16,7 @@ public class LevelManager : MonoBehaviour
     {
         Time.timeScale = 1;
         _amountOfPokemon = GameObject.FindGameObjectsWithTag("Pokemon").Length;
-        endTime = 150f;
+        endTime = 30f;
         _gui = GameObject.Find("GUI").GetComponent<GUIManager>();
     }
 
@@ -63,5 +64,7 @@ public class LevelManager : MonoBehaviour
             _gui.ReportToPlayer("Well done!", "You have captured " + _amountOfPokemonCaught + " Psyducks ", reason);
 
         }
+        
+        GameState.HighScore = math.max(GameState.HighScore, _amountOfPokemonCaught);
     }
 }

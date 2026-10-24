@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
 
     public float jumpHeight = 20f;
     public float speed = 2f;
-    public float runSpeed = 5f;
+    public float runSpeed = 8f;
 
     private float _walkingVolume = 0.5f;
     private float _runningVolume = 0.8f;

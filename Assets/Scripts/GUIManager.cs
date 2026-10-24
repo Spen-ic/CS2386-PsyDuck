@@ -67,7 +67,8 @@ public class GUIManager : MonoBehaviour
         _titleLabel.visible = true;
         _line1Label.visible = true;
         _line2Label.visible = false;
-        _returnButton.visible = true;
+        // _returnButton.visible = true;
+        _returnButton.visible = false; // made false because this is called when showing score; shouldnt return
         _returnButton.text = "Return to Start";
         
         Invoke(nameof(HideReport), visibleTime);
