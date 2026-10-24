@@ -1,3 +1,5 @@
+using Cinemachine;
+using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -15,6 +17,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     [Tooltip("Insert Main Camera")]
     private Camera mainCamera;
+
+    [SerializeField] private CinemachineFreeLook cineCam;
+    [SerializeField] float aimRadiusScale = 0.4f;  // 0.4 = 40% of normal distance
+    [SerializeField] float aimFOV = 40f;
+    [SerializeField] float aimScreenX = 0.35f;     // < 0.5 = right shoulder view
+    [SerializeField] float aimScreenY = 0.6f;     // < 0.5 = right shoulder view
+    [SerializeField] float aimHeightScale = 0.7f;     // < 0.5 = right shoulder view
+    
+    private float _normalFOV, _normalScreenX, _normalScreenY;
+    private float[] _normalHeight = new float[3];
+    private float[] _normalRadius = new float[3];
+    private CinemachineComposer[] _composers = new CinemachineComposer[3];
     
     [SerializeField]
     [Tooltip("Insert Animation Controller")]
@@ -43,7 +57,7 @@ public class PlayerController : MonoBehaviour
     private float _runningVolume = 0.8f;
 
     private bool _throwing;
-    public float throwStrength = 4f;
+    public float throwStrength = 5.5f;
     private GameObject _instantiatedPokeball;
     
     [SerializeField] private AudioClip[] grassSounds;
@@ -67,6 +81,17 @@ public class PlayerController : MonoBehaviour
         playerAS2.maxDistance = 5f;
         
         footStepLayerName(transform.position, Terrain.activeTerrain);
+        
+        // setup variables necessary for aiming camera logic
+        _normalFOV = cineCam.m_Lens.FieldOfView;
+        for (int i = 0; i < 3; i++)
+        {
+            _normalHeight[i] = cineCam.m_Orbits[i].m_Height;
+            _normalRadius[i] = cineCam.m_Orbits[i].m_Radius;
+            _composers[i] = cineCam.GetRig(i).GetCinemachineComponent<CinemachineComposer>();
+        }
+        _normalScreenX = _composers[1].m_ScreenX;
+        _normalScreenY = _composers[1].m_ScreenY;
     }
 
     // Update is called once per frame
@@ -101,6 +126,32 @@ public class PlayerController : MonoBehaviour
             _throwing = true;
             SpawnPokeballToBone();
             playerAnimator.SetBool(IsThrowing, true);
+        }
+
+        if (_throwing && Input.GetButton("Fire1")) // hold animation for aiming
+        {
+            playerAnimator.speed += math.clamp(Time.deltaTime * 2f, 0f, 1f) * (0 - playerAnimator.speed);
+        }
+        else // return to normal anim speeds
+        {
+            playerAnimator.speed += math.clamp(Time.deltaTime * 8f, 0f, 1f) * (1 - playerAnimator.speed);
+        }
+        
+        //aiming camera
+        bool isAiming = Input.GetButton("Fire1") || _throwing; // your condition x
+        float t = 0.04f;
+
+        cineCam.m_Lens.FieldOfView = Mathf.Lerp(cineCam.m_Lens.FieldOfView, isAiming ? aimFOV : _normalFOV, t);
+
+        for (int i = 0; i < 3; i++) // iterate through rigs (bottom mid top)
+        {
+            float targetRadius = isAiming ? _normalRadius[i] * aimRadiusScale : _normalRadius[i];
+            cineCam.m_Orbits[i].m_Radius = Mathf.Lerp(cineCam.m_Orbits[i].m_Radius, targetRadius, t);
+            float targetHeight = isAiming ? _normalHeight[i] * aimHeightScale : _normalHeight[i];
+            cineCam.m_Orbits[i].m_Height = Mathf.Lerp(cineCam.m_Orbits[i].m_Height, targetHeight, t);
+
+            _composers[i].m_ScreenX = Mathf.Lerp(_composers[i].m_ScreenX, isAiming ? aimScreenX : _normalScreenX, t);
+            _composers[i].m_ScreenY = Mathf.Lerp(_composers[i].m_ScreenY, isAiming ? aimScreenY : _normalScreenY, t);
         }
         
         // apply movement
