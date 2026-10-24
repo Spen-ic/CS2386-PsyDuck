@@ -368,6 +368,7 @@ public class PsyduckController : MonoBehaviour
     // do not rename; animation event calls it
     public void footStep()
     {
+        pokemonAS2.pitch = Random.Range(0.8f, 1.2f);
         pokemonAS2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
         if (footStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
         {
