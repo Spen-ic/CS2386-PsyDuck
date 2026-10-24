@@ -39,6 +39,9 @@ public class PlayerController : MonoBehaviour
     public float speed = 2f;
     public float runSpeed = 5f;
 
+    private float _walkingVolume = 0.5f;
+    private float _runningVolume = 0.8f;
+
     private bool _throwing;
     public float throwStrength = 4f;
     private GameObject _instantiatedPokeball;
@@ -59,7 +62,7 @@ public class PlayerController : MonoBehaviour
         playerAS1.maxDistance = 5f;
         
         playerAS2 = GetComponents<AudioSource>()[1];
-        playerAS2.volume = 0.25f;
+        playerAS2.volume = _walkingVolume;
         playerAS2.spatialBlend = 1f;
         playerAS2.maxDistance = 5f;
         
@@ -108,13 +111,13 @@ public class PlayerController : MonoBehaviour
             {
                 controller.Move(movement * (runSpeed * Time.deltaTime));
                 playerAnimator.SetBool(IsRunning, true);
-                playerAS2.volume = 0.4f;
+                playerAS2.volume = _runningVolume;
             }
             else
             {
                 controller.Move(movement * (speed * Time.deltaTime));
                 playerAnimator.SetBool(IsRunning, false);
-                playerAS2.volume = 0.25f;
+                playerAS2.volume = _walkingVolume;
             }
         }
         
@@ -212,6 +215,7 @@ public class PlayerController : MonoBehaviour
     // ReSharper disable once InconsistentNaming
     public void footStep()
     {
+        playerAS2.pitch = Random.Range(0.7f, 1.3f); // randomize footstep pitch for more variation
         playerAS2.clip = grassSounds[Random.Range(0, grassSounds.Length)];
         if (footStepLayerName(transform.position, Terrain.activeTerrain) == "TL_Sand")
         {
