@@ -376,13 +376,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 172637244261139151}
   mainCamera: {fileID: 0}
+  cineCam: {fileID: 0}
+  aimRadiusScale: 0.4
+  aimFOV: 40
+  aimScreenX: 0.35
+  aimScreenY: 0.6
+  aimHeightScale: 0.7
   playerAnimator: {fileID: 0}
   pokeballPF: {fileID: 0}
   pokeballBone: {fileID: 0}
   jumpHeight: 20
   speed: 2
-  runSpeed: 5
+  runSpeed: 10
   throwStrength: 4
+  grassSounds: []
+  sandSounds: []
 --- !u!143 &172637244261139151
 CharacterController:
   m_ObjectHideFlags: 0

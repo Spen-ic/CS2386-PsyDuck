@@ -45,7 +45,7 @@ public class LevelManager : MonoBehaviour
         }
         if (_amountOfPokemon <= 0)
         {
-            EndGame(" before they all escaped");
+            EndGame(" and no more psyducks remain!");
         }
     }
 
